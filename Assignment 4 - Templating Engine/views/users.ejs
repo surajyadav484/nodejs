@@ -1,0 +1,10 @@
+<%- include('includes/head.ejs') %>
+  <body>
+    <h1>Users List</h1>
+    <ul>
+      <%console.log("userData",userData) %> <% for(let users of userData){ %>
+      <li><%=users.username%></li>
+      <%}%>
+    </ul>
+  </body>
+</html>
