@@ -1,3 +1,4 @@
+const { user } = require("pg/lib/defaults");
 const Product = require("../models/product");
 
 exports.getAddProduct = (req, res, next) => {
@@ -15,8 +16,14 @@ exports.getEditProduct = (req, res, next) => {
   let editMode = req.query.edit;
   let prodId = req.params.productId;
 
-  Product.findByPk(prodId)
-    .then((product) => {
+  req.user
+    .getProducts({ where: { id: prodId } })
+    //Product.findByPk(prodId)
+    .then((products) => {
+      const product = products[0];
+      if (!product) {
+        return res.redirect("/");
+      }
       res.render("admin/edit-product", {
         pageTitle: "Edit Product",
         path: "/admin/edit-product",
@@ -34,18 +41,33 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
 
-  Product.create({
-    title,
-    imageUrl,
-    price,
-    description,
-  })
+  req.user
+    .createProduct({
+      title,
+      imageUrl,
+      price,
+      description,
+    })
     .then((result) => {
       console.log("Values inserted successfully");
       res.redirect("/admin/products");
     })
     .catch((err) => console.log(err));
 };
+//Another way of creating product with same user
+//   Product.create({
+//     title,
+//     imageUrl,
+//     price,
+//     description,
+//     userId: req.user.id,
+//   })
+//     .then((result) => {
+//       console.log("Values inserted successfully");
+//       res.redirect("/admin/products");
+//     })
+//     .catch((err) => console.log(err));
+// };
 
 exports.postEditProduct = (req, res, next) => {
   const { productId, title, imageUrl, description, price } = req.body;
@@ -70,7 +92,9 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
+  req.user
+    .getProducts()
+    //Product.findAll()
     .then((products) => {
       res.render("admin/products", {
         prods: products,
