@@ -17,7 +17,12 @@ exports.getProducts = (req, res, next) => {
 
 exports.getIndex = (req, res, next) => {
   Product.find()
+    /* This is not required over here but we can use these method to selectively fetch the values.
+       The values what we dont want to feth we put it after '-' sign
+    .select("title price -_id")
+    .populate("userId", "name") */
     .then((products) => {
+      console.log(products);
       res.render("shop/index", {
         prods: products,
         pageTitle: "Shop",
@@ -30,8 +35,10 @@ exports.getIndex = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then((products) => {
+    .populate("cart.items.productId")
+    .then((user) => {
+      const { items } = user.cart;
+      const products = items;
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",

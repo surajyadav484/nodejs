@@ -42,12 +42,13 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-
+  const userId = req.user; //mongoose will automatically fetch Id and store it inside userID
   const product = new Product({
     title,
     price,
     description,
     imageUrl,
+    userId,
   });
   product
     .save()
