@@ -1,6 +1,7 @@
 const path = require("path");
 
-const mongoConnect = require("./util/database").MongoClient;
+// const mongoConnect = require("./util/database").MongoClient;
+const mongoose = require("mongoose");
 
 const User = require("./models/users");
 
@@ -23,19 +24,23 @@ const shopRoutes = require("./routes/shop");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use((req, res, next) => {
-  User.findUserById("6275fc269f1edd2312f322da")
-    .then((user) => {
-      req.user = new User(user.username, user.email, user.cart, user._id);
-      next();
-    })
-    .catch((err) => console.log(err));
-});
+// app.use((req, res, next) => {
+//   User.findUserById("6275fc269f1edd2312f322da")
+//     .then((user) => {
+//       req.user = new User(user.username, user.email, user.cart, user._id);
+//       next();
+//     })
+//     .catch((err) => console.log(err));
+// });
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(errorController.get404);
 
-mongoConnect(() => {
-  app.listen(3000);
-});
+mongoose
+  .connect(
+    "mongodb+srv://suraj:Suraj123@cluster0.yizdy.mongodb.net/shop?retryWrites=true&w=majority"
+  )
+  .then((result) => {
+    app.listen(3000);
+  });
